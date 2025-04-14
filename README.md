@@ -53,11 +53,10 @@ To run the examples in this repository, ensure you have the following installed:
 ## Folder Structure
 
 ```
-fastapi-learning-exercises/
-├── app/                # Application code
-├── tests/              # Test cases
-├── requirements.txt    # Python dependencies
-├── README.md           # Project documentation
+├── README.md
+├── fast_api.ipynb
+├── main.py
+└── requirements.txt
 ```
 
 ## Contributing

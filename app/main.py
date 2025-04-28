@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Query, Path, Body
 from enum import Enum
 from pydantic import BaseModel, Field, HttpUrl
-from typing import Annotated, Literal, List, Union
+from typing import Annotated, Literal, List, Union,Dict
+from .nested_models import Item, Profile, Product, Image
 
 
 # Pydantic models
@@ -56,6 +57,15 @@ class ModelName(str, Enum):
     alexnet = 'alexnet'
     resnet = 'resnet'
     lenet = 'lenet'
+
+
+#  Nested models
+class NestedItem(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tags: set[str] = set()
+    image: Image | None = Field(default=None, title="The image of the item", description="The image of the item", example={"url": "http://example.com/image.png", "name": "Image"})
 
 
 app = FastAPI()
@@ -190,3 +200,45 @@ async def get_new_items(filter_query: Annotated[FilterParams, Query()]):
 async def update_item(item_id: int, item: Item, user: User, importance: Annotated[int, Body()]):
     results = {'item_id': item_id, 'item': item, 'user': user}
     return results
+
+
+#  Bodies of arbitrary dicts
+@app.post('/items1/')
+async def create_item(weights: dict[int, float]):
+    return {'weights': weights}
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item) -> Dict[str, str]:
+    '''
+    This endpoint is used to update an item by its id
+    Args:
+        item_id(int): id of the item
+        item: Item Request Body
+    Returns
+        results(dict): dictionary containing updated item
+    '''
+    results = {"item_id": item_id, "item": item}
+    return results
+
+@app.put('/profile/{profile_id}')
+async def update_item(profile_id: int, profile: Profile):
+    '''
+    This endpoint is used to update a users profile by id
+    Args:
+        profile_id(int): user's profile id
+        profile: Profile request body
+    Returns:
+        results(dict): dictionary of profile details 
+    '''
+    results = {"user_id": profile_id, "profile_details": profile}
+    return results
+
+@app.post("/offers")
+async def create_offer(offer: Product):
+    return offer
+
+@app.post('/images/multiple')
+async def create_multiple_images(images: list[Image]):
+    for image in images:
+        image.url
+    return image
